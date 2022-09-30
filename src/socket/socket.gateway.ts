@@ -1,10 +1,12 @@
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
+  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { createRoomProps } from './socket.types';
 
 @WebSocketGateway({
   cors: {
@@ -25,5 +27,11 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   public handleDisconnect(client: Socket) {
     console.log('client disconnected!', client.id);
+  }
+
+  @SubscribeMessage('createRoom')
+  public roomConnection(client: Socket, params: createRoomProps): boolean {
+    console.log({ params });
+    return true;
   }
 }
