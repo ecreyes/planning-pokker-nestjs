@@ -6,6 +6,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { RoomService } from '../room/room.service';
 import { createRoomProps } from './socket.types';
 
 @WebSocketGateway({
@@ -17,7 +18,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   private server: Server;
 
-  constructor() {
+  constructor(private roomService: RoomService) {
     //
   }
 
@@ -30,8 +31,15 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('createRoom')
-  public roomConnection(client: Socket, params: createRoomProps): boolean {
-    console.log({ params });
-    return true;
+  public async roomConnection(
+    client: Socket,
+    params: createRoomProps,
+  ): Promise<boolean> {
+    try {
+      return await this.roomService.createRoom(params);
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
   }
 }

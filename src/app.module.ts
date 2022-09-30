@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { SecurityModule } from './security/security.module';
 import { SocketModule } from './socket/socket.module';
 
 @Module({
@@ -10,6 +11,7 @@ import { SocketModule } from './socket/socket.module';
       isGlobal: true,
     }),
     SocketModule,
+    SecurityModule,
   ],
   controllers: [AppController],
   providers: [AppService],
