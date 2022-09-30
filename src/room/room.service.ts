@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { createRoomProps } from '../socket/socket.types';
 import { SecurityService } from '../security/security.service';
 import { PrismaService } from '../database/prisma.service';
+import { Room } from '@prisma/client';
 
 @Injectable()
 export class RoomService {
@@ -17,7 +18,7 @@ export class RoomService {
     adminPassword,
     room,
     roomPassword,
-  }: createRoomProps): Promise<boolean> {
+  }: createRoomProps): Promise<Room | null> {
     try {
       const hashedAdminPassword = await this.securityService.hashPassword(
         adminPassword,
@@ -34,12 +35,25 @@ export class RoomService {
         },
       });
 
-      if (!data) return false;
-
-      return true;
+      return data;
     } catch (error) {
       console.log(error);
-      return false;
+      return null;
+    }
+  }
+
+  public async getListOfRooms(): Promise<Pick<Room, 'id' | 'name'>[]> {
+    try {
+      const rooms = await this.prisma.room.findMany({
+        select: {
+          id: true,
+          name: true,
+        },
+      });
+      return rooms;
+    } catch (error) {
+      console.log(error);
+      return [];
     }
   }
 }

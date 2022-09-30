@@ -30,13 +30,29 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log('client disconnected!', client.id);
   }
 
+  @SubscribeMessage('getRooms')
+  public async getRooms() {
+    try {
+      const allRooms = await this.roomService.getListOfRooms();
+      return allRooms;
+    } catch (error) {
+      console.log(error);
+      return [];
+    }
+  }
+
   @SubscribeMessage('createRoom')
   public async roomConnection(
     client: Socket,
     params: createRoomProps,
   ): Promise<boolean> {
     try {
-      return await this.roomService.createRoom(params);
+      const room = await this.roomService.createRoom(params);
+      if (room) {
+        this.server.emit('roomAdded', { id: room.id, name: room.name });
+        return true;
+      }
+      return false;
     } catch (error) {
       console.log(error);
       return false;
