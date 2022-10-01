@@ -7,6 +7,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { RoomService } from '../room/room.service';
+import { SocketService } from './socket.service';
 import { createRoomProps } from './socket.types';
 
 @WebSocketGateway({
@@ -18,12 +19,16 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   private server: Server;
 
-  constructor(private roomService: RoomService) {
+  constructor(
+    private roomService: RoomService,
+    private socketService: SocketService,
+  ) {
     //
   }
 
   public handleConnection(client: Socket, ...args: any[]) {
     console.log('client connected!', client.id);
+    this.server.to(client.id).emit('session', this.socketService.getSession());
   }
 
   public handleDisconnect(client: Socket) {
