@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { uuid } from 'uuidv4';
-
+import { v4 as uuidv4 } from 'uuid';
 @Injectable()
 export class SocketService {
   public getSession(): string {
-    return uuid();
+    return uuidv4();
   }
 }
